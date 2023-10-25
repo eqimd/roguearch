@@ -1,5 +1,5 @@
 from hello.hello import say_hello
-from hello2.hello import say_hello_in
+from hello2.hello2 import say_hello_in
 
 
 def test_hello():

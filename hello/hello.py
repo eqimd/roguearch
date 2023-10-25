@@ -1,4 +1,4 @@
-from hello2.hello import say_hello_in
+from hello2.hello2 import say_hello_in
 
 
 def say_hello() -> str:
