@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "roguearch"
+version = "0.0.1"
+description = "Roguelike developed for the A&DIS course @ SPbU"
+authors = [
+    "Georgiy Angeni <angenispb@mail.ru>",
+    "Daniil Lyubaev <lyubaevda@gmail.com>",
+    "Denis Korotchenko <dzd1024ozd@gmail.com>",
+]
+readme = "README.md"
+packages = [
+    {include = "hello"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.dev]
+optional = true
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.1.0"
+pytest = "^7.4.3"
+mypy = "^1.6.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
