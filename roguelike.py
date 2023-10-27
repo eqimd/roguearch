@@ -1,7 +1,7 @@
 from hello.hello import say_hello
 
 
-def main():
+def main() -> None:
     print(say_hello())
 
 
