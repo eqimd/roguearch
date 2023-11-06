@@ -4,6 +4,7 @@ from screen.screen import Screen
 
 
 class ScreenMainMenu(Screen):
+    # дублирование имен в ControllerMainMenu
     menu_items = [
         'Start Game',
         'Load Game'

@@ -9,11 +9,6 @@ from screen.screen_main_menu import ScreenMainMenu
 class ControllerMainMenu(Controller):
     id = ControllerEnum.MainMenu
 
-    menu_items = [
-        'Start Game',
-        'Load Game'
-    ]
-
     def __init__(self, terminal: Terminal) -> None:
         super().__init__()
         self.screen = ScreenMainMenu(terminal)
@@ -27,14 +22,14 @@ class ControllerMainMenu(Controller):
 
         match key:
             case "w" | "KEY_UP":
-                new_selection = (self.selection - 1) % len(self.menu_items)
+                new_selection = (self.selection - 1) % len(self.screen.menu_items)
                 self.screen.update(new_selection, self.selection)
                 self.selection = new_selection
             case "s" | "KEY_DOWN":
-                new_selection = (self.selection + 1) % len(self.menu_items)
+                new_selection = (self.selection + 1) % len(self.screen.menu_items)
                 self.screen.update(new_selection, self.selection)
                 self.selection = new_selection
-            case "q" | "KEY_ENTER":
+            case "KEY_ENTER":
                 match self.selection:
                     case 0:
                         # TODO: start the game

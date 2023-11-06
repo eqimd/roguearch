@@ -40,7 +40,7 @@ class ControllerMaster:
         match ControllerMaster.controller.id:
             case ControllerEnum.MainMenu:
                 match key:
-                    case 'KEY_ESCAPE':
+                    case "q" | "KEY_ESCAPE":
                         cls.set_underlying_controller(ControllerExit())
                     case _:
                         res.fail('Invalid input')

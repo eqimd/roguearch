@@ -2,12 +2,10 @@ from abc import ABC, abstractmethod
 
 from controller.controller_enum import ControllerEnum
 from meta.result import Result
-from screen.screen import Screen
 
 
 class Controller(ABC):
     id: ControllerEnum
-    screen: Screen
 
     @abstractmethod
     def draw_screen(self) -> None:

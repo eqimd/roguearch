@@ -7,9 +7,9 @@ from controller.controller_master import ControllerMaster
 
 def init() -> InputCapture:
     terminal = Terminal()
-    main_menu_controller = ControllerMainMenu(terminal)
-    master_controller = ControllerMaster(terminal, main_menu_controller)
-    return InputCapture(terminal, master_controller)
+    controller_main_menu = ControllerMainMenu(terminal)
+    controller_master = ControllerMaster(terminal, controller_main_menu)
+    return InputCapture(terminal, controller_master)
 
 
 def main() -> None:
