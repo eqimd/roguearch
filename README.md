@@ -1,5 +1,9 @@
 # roguearch
 
+Авторы: Георгий Ангени, Даниил Любаев, Денис Коротченко.
+
+Design Document можно изучить в файле [DesignDocument.pdf](DesignDocument.pdf)
+
 Для корректной установки и запуска нужно создать виртуальную среду под игру и выполнить `pip install -r requirements.txt`
 
 Далее игру можно запускать с помощью `python3 roguelike.py`
