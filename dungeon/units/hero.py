@@ -28,6 +28,7 @@ class Hero(Unit):
         self.base_attack = 4
         self.base_magic = 4
         self.base_accuracy = 0
+        self.base_dodge = 0
         self.base_resistance = 0
         self.base_max_weight = 5
 
@@ -36,12 +37,12 @@ class Hero(Unit):
         self.status_effects: List[Effect] = list()
 
         # give at start or load from file?
+        # TODO: consider item attributes in calculation (and add attribute effects on items)
         self.weapon: Weapon
         self.upper_body: Armor
         self.lower_body: Armor
         self.ring: Trinket
         self.amulet: Trinket
-        # WearableItem with effects - apply effects
 
     def cast_on_self(self) -> None:
         pass
@@ -58,7 +59,7 @@ class Hero(Unit):
 
     @property
     def max_mp(self) -> int:
-        base = self.base_max_hp + 2 * self.attrs.vitality
+        base = self.base_max_hp + 2 * self.attrs.intelligence
         shifted = cast(int, self.__apply_effects(EffectEnum.MPOffset, base))
         multiplier = cast(float, self.__apply_effects(EffectEnum.MPMultiplier, 1))
         return floor(shifted * multiplier)
@@ -79,7 +80,7 @@ class Hero(Unit):
 
     @staticmethod
     def crit_value_to_chance(value: int) -> float:
-        return 1 - 2 ** (- value / 20)
+        return max(1 - 2 ** (- value / 20), 0)
 
     @property
     def crit_chance(self) -> float:
@@ -98,12 +99,26 @@ class Hero(Unit):
         return (2 * base) if random() < self.crit_chance else base
 
     @property
+    def dodge(self) -> int:
+        return self.base_dodge + self.attrs.dexterity
+
+    @staticmethod
+    def dodge_value_to_chance(value: int) -> float:
+        return max(1 - 2 ** (- value / 20), 0)
+
+    @property
+    def dodge_chance(self) -> float:
+        base_no_dodge = 1 - Hero.dodge_value_to_chance(self.accuracy)
+        modifier_no_dodge = cast(float, self.__apply_effects(EffectEnum.DodgeMultiplier, 1))
+        return 1 - base_no_dodge * modifier_no_dodge
+
+    @property
     def resistance(self) -> int:
         return self.base_resistance + self.attrs.perseverance
 
     @staticmethod
     def resistance_value_to_chance(value: int) -> float:
-        return 1 - 2 ** (- value / 20)
+        return max(0, 1 - 2 ** (- value / 20))
 
     @property
     def bleed_resistance(self) -> float:

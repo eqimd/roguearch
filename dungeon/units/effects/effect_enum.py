@@ -8,6 +8,7 @@ class EffectEnum(Enum):
     MPMultiplier = 11
     AccOffset = 20
     CritMultiplier = 30
+    DodgeMultiplier = 40
     BleedResMultiplier = 90
     PoisonResMultiplier = 91
     DebuffResMultiplier = 92
