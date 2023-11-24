@@ -10,10 +10,10 @@ class Effect(ABC):
     def __init__(self, id: EffectEnum) -> None:
         self.id = id
 
-    def apply_if_possible(self, other_id: EffectEnum, *args: Any) -> Any:
+    def apply_if_possible(self, other_id: EffectEnum, *args, **kwargs) -> Any:  # type: ignore
         return self.__apply(*args) if self.id == other_id else args
 
     @abstractmethod
-    def __apply(self, *args: Any) -> Any:
+    def __apply(self, *args, **kwargs) -> Any:  # type: ignore
         "Effect application function"
         pass
