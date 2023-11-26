@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
 
-from dungeon.units.actions import Action
+from dungeon.units.actions.action import Action
 from dungeon.tiles import Tile
 from meta.result import Result
 
@@ -23,11 +23,11 @@ class Unit(ABC):
     def perform_action(self) -> Result:
         return self.action.perform() if self.action is not None else Result(ok=False, msg='Action not set')
 
-    def calculate_distance_self(self, other: Unit, tiles: List[List[Tile]]) -> int:
-        return Unit.calculate_distance(self.x, self.y, other, tiles)
+    def calculate_distance_self(self, other: Unit, units: List[Unit], tiles: List[List[Tile]]) -> int:
+        return Unit.calculate_distance(self.x, self.y, other, units, tiles)
 
     @staticmethod
-    def calculate_distance(pos_x: int, pos_y: int, other: Unit, tiles: List[List[Tile]]) -> int:
+    def calculate_distance(pos_x: int, pos_y: int, other: Unit, units: List[Unit], tiles: List[List[Tile]]) -> int:
         checked = set()
         s_queue: List[Tuple[Tuple[int, int], int]] = [((pos_x, pos_y), 0)]
         t = (other.x, other.y)
@@ -41,7 +41,11 @@ class Unit(ABC):
             for x_diff in [-1, 0, 1]:
                 for y_diff in [-1, 0, 1]:
                     next_step = (s_cur[0][0] + x_diff, s_cur[0][1] + y_diff)
-                    if tiles[next_step[0]][next_step[1]].colliding or next_step in checked:
+                    if (
+                        tiles[next_step[0]][next_step[1]].colliding
+                        or any((unit.x, unit.y) == next_step for unit in units)
+                        or next_step in checked
+                    ):
                         continue
 
                     s_queue.append((next_step, s_cur[1] + 1))

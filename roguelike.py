@@ -3,6 +3,7 @@ from blessed import Terminal
 from controller.input_capture import InputCapture
 from controller.controller_main_menu import ControllerMainMenu
 from controller.controller_master import ControllerMaster
+from dungeon.dungeon_loader import DungeonLoader
 
 
 def init() -> InputCapture:
@@ -13,6 +14,8 @@ def init() -> InputCapture:
 
 
 def main() -> None:
+    _ = DungeonLoader.load('./assets/basic_map.json')
+
     capture = init()
     capture.await_and_forward_input()
 
