@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-
-from meta.result import Result
+from dungeon.units.actions.action_result import ActionResult
 
 
 class Action(ABC):
     @abstractmethod
-    def perform(self) -> Result:
+    def perform(self) -> ActionResult:
         """
         Called by a unit from its action field
         Yields whether the action succeeded

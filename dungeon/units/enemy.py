@@ -12,6 +12,9 @@ import dungeon.units.actions.actions as Actions
 
 
 class Enemy(Unit):
+    symbol_seen = 'o'
+    symbol_not_seen = 'z'
+
     def __init__(
             self,
             pos_x: int,
@@ -49,6 +52,10 @@ class Enemy(Unit):
     @staticmethod
     def make_basic_enemy_by_level(pos_x: int, pos_y: int, level: int, hero_seen: bool = False) -> Enemy:
         return Enemy(pos_x, pos_y, 10 + 2 * level, 0, 0.8, 0.1, 2 + level, 0, 0.1, 0.2, 0.2, 0.2, hero_seen)
+
+    @property
+    def symbol(self) -> str:
+        return Enemy.symbol_seen if self.hero_seen else Enemy.symbol_not_seen
 
     def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
         """

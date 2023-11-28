@@ -22,6 +22,8 @@ class HeroAttributes:
 
 
 class Hero(Unit):
+    symbol_self = '@'
+
     def __init__(self, pos_x: int, pos_y: int, attrs: HeroAttributes) -> None:
         super().__init__(pos_x, pos_y)
 
@@ -50,6 +52,10 @@ class Hero(Unit):
 
         # later add:
         # Inventory
+
+    @property
+    def symbol(self) -> str:
+        return Hero.symbol_self
 
     @property
     def max_hp(self) -> int:

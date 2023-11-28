@@ -5,10 +5,11 @@ from typing import List, Optional, Tuple
 
 from dungeon.units.actions.action import Action
 from dungeon.tiles import Tile
-from meta.result import Result
+from dungeon.units.actions.action_result import ActionResult, Fail
+from dungeon.units.entity import Entity
 
 
-class Unit(ABC):
+class Unit(Entity):
     def __init__(self, pos_x: int, pos_y: int) -> None:
         self.x = pos_x
         self.y = pos_y
@@ -20,8 +21,8 @@ class Unit(ABC):
     def set_action(self, action: Action) -> None:
         self.action = action
 
-    def perform_action(self) -> Result:
-        return self.action.perform() if self.action is not None else Result(ok=False, msg='Action not set')
+    def perform_action(self) -> ActionResult:
+        return self.action.perform() if self.action is not None else Fail('Action not set')
 
     def calculate_distance_self(self, other: Unit, units: List[Unit], tiles: List[List[Tile]]) -> int:
         return Unit.calculate_distance(self.x, self.y, other, units, tiles)

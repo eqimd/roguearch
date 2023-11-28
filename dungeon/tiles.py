@@ -7,6 +7,9 @@ class Tile:
     colliding: bool     # blocks passage
     obscuring: bool     # blocks vision
 
+    def __str__(self) -> str:
+        return self.symbol
+
 
 Empty = Tile(' ', False, False)
 Floor = Tile('.', False, False)

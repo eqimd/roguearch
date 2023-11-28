@@ -92,7 +92,7 @@ class DungeonLoader:
 
         map = DungeonLoader.__items_to_map(rooms, doors, exits)
 
-        return Dungeon(map, units)
+        return Dungeon(map, hero, units)
 
     @staticmethod
     def __items_to_map(
