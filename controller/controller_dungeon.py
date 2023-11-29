@@ -72,9 +72,8 @@ class ControllerDungeon(Controller):
     def perform_game_move(self) -> None:
         hero_res = self.dungeon.hero.perform_action()
 
-        # for unit in self.dungeon.units:
-        #     unit.perform_action()
-        # 
+        for unit in self.dungeon.units:
+            unit.perform_action()
 
         self.draw_screen()
         self.screen.draw_msg(hero_res.msg)

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from math import floor
 from typing import Any, List, cast
+from dungeon.active_inventory import ActiveInventory
 from dungeon.inventory import Inventory
 
 from dungeon.units.effects.effect import Effect
@@ -28,6 +29,8 @@ class Hero(Unit):
     def __init__(self, pos_x: int, pos_y: int, attrs: HeroAttributes, inventory: Inventory) -> None:
         super().__init__(pos_x, pos_y)
 
+        # TODO: it is stub currently
+        self.active_inventory = ActiveInventory(Weapon(ItemEnum.Weapon, 0, [], 1, 1))
         self.inventory = inventory
 
         self.base_max_hp = 40

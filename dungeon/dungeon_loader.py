@@ -43,6 +43,8 @@ class DungeonLoader:
         exits: List[Tuple[int, int]] = list()
         units: List[Unit] = list()
 
+        dungeon = Dungeon([], None, [])
+
         for item in data:
             match item['type']:
                 case "room":
@@ -76,7 +78,7 @@ class DungeonLoader:
                     match enemy_name:
                         case "basic":
                             try:
-                                units.append(Enemy.make_basic_enemy_by_level(item['x'], item['y'], item['level']))
+                                units.append(Enemy.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an enemy item', item)
                         case _:
@@ -89,11 +91,14 @@ class DungeonLoader:
             raise DungeonLoaderException('')
         # TODO: add means of loading a hero from state
         hero = Hero(*start, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
-        units.insert(0, hero)
+        # units.insert(0, hero)
 
         map = DungeonLoader.__items_to_map(rooms, doors, exits)
+        dungeon.map = map
+        dungeon.hero = hero
+        dungeon.units = units
 
-        return Dungeon(map, hero, units)
+        return dungeon
 
     @staticmethod
     def __items_to_map(

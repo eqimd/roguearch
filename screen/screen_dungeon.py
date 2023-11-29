@@ -24,6 +24,10 @@ class ScreenDungeon(Screen):
             with self.terminal.location(width_offset + unit.x, height_offset + unit.y):
                 print(unit.symbol, end='')
 
+        hero = self.dungeon.hero
+        with self.terminal.location(width_offset + hero.x, height_offset + hero.y):
+            print(hero.symbol, end='')
+
     def update(self, *args: Any, **kwargs: Any) -> None:
         return super().update(*args, **kwargs)
 

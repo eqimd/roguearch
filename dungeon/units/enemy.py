@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from random import shuffle
 from typing import List, Optional, Tuple
+from dungeon.dungeon import Dungeon
 
 from dungeon.tiles import Tile
 from dungeon.units.actions.action import Action
+from dungeon.units.actions.action_result import ActionResult
 from dungeon.units.hero import Hero
 from dungeon.units.unit import Unit
 
@@ -17,6 +19,7 @@ class Enemy(Unit):
 
     def __init__(
             self,
+            dungeon: Dungeon,
             pos_x: int,
             pos_y: int,
             max_hp: int,
@@ -33,6 +36,7 @@ class Enemy(Unit):
     ) -> None:
         super().__init__(pos_x, pos_y)
 
+        self.dungeon = dungeon
         self.__max_hp = max_hp
         self.__max_mp = max_mp
         self.__hit_chance = hit_chance
@@ -49,9 +53,16 @@ class Enemy(Unit):
 
         self.hero_seen = hero_seen
 
+    def perform_action(self) -> ActionResult:
+        action = self.generate_action(self.dungeon.hero, self.dungeon.units, self.dungeon.map)
+
+        self.set_action(action)
+
+        return super().perform_action()
+
     @staticmethod
-    def make_basic_enemy_by_level(pos_x: int, pos_y: int, level: int, hero_seen: bool = False) -> Enemy:
-        return Enemy(pos_x, pos_y, 10 + 2 * level, 0, 0.8, 0.1, 2 + level, 0, 0.1, 0.2, 0.2, 0.2, hero_seen)
+    def make_basic_enemy_by_level(dungeon: Dungeon, pos_x: int, pos_y: int, level: int, hero_seen: bool = False) -> Enemy:
+        return Enemy(dungeon, pos_x, pos_y, 10 + 2 * level, 0, 0.8, 0.1, 2 + level, 0, 0.1, 0.2, 0.2, 0.2, hero_seen)
 
     @property
     def symbol(self) -> str:
