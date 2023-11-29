@@ -1,9 +1,10 @@
 from blessed import Terminal
 from controller.controller import Controller
 from controller.controller_enum import ControllerEnum
+from controller.controller_inventory import ControllerInventory
 from dungeon.dungeon import Dungeon
 from dungeon.units.actions.actions import MoveAction
-from meta.result import ChangeToPrevController, ForwardInput, Ok, Result
+from meta.result import ChangeToNextController, ChangeToPrevController, ForwardInput, Ok, Result
 from screen.screen_dungeon import ScreenDungeon
 
 
@@ -13,6 +14,7 @@ class ControllerDungeon(Controller):
     def __init__(self, terminal: Terminal, dungeon: Dungeon, prev_controller: Controller):
         super().__init__
         self.prev_ctrl = prev_controller
+        self.next_ctrl = self
         self.screen = ScreenDungeon(terminal, dungeon)
         self.terminal = terminal
         self.set_underlying_dungeon(dungeon)
@@ -22,6 +24,9 @@ class ControllerDungeon(Controller):
 
     def prev_controller(self) -> Controller:
         return self.prev_ctrl
+
+    def next_controller(self) -> Controller:
+        return self.next_ctrl
     
     def parse_key(self, key: str) -> Result:
         match key:
@@ -53,11 +58,17 @@ class ControllerDungeon(Controller):
                 self.perform_game_move()
 
                 return Ok('')
-            case "q":
+            case 'q':
                 return ChangeToPrevController()
+            case 'e':
+                controller_inventory = ControllerInventory(self.terminal, self.dungeon.hero.inventory, self)
+                self.next_ctrl = controller_inventory
+
+                return ChangeToNextController()
             
         return ForwardInput()
     
+
     def perform_game_move(self) -> None:
         hero_res = self.dungeon.hero.perform_action()
 
@@ -65,8 +76,7 @@ class ControllerDungeon(Controller):
         #     unit.perform_action()
         # 
 
-        
-        self.screen.draw()
+        self.draw_screen()
         self.screen.draw_msg(hero_res.msg)
 
 

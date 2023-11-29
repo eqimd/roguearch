@@ -10,10 +10,10 @@ class ScreenDungeon(Screen):
         self.dungeon = dungeon
 
     def draw(self, *args: Any, **kwargs: Any) -> None:
-        self.__flush_screen()
+        Screen.flush(self.terminal)
 
-        width_offset = (self.terminal.width - len(self.dungeon.map)) // 2 - 1
-        height_offset = (self.terminal.height - len(self.dungeon.map[0])) // 2 + 1
+        width_offset = (self.terminal.width - len(self.dungeon.map)) // 2
+        height_offset = (self.terminal.height - len(self.dungeon.map[0])) // 2
 
         for idx, row in enumerate(self.dungeon.map):
             for idy, tile in enumerate(row):
@@ -24,9 +24,6 @@ class ScreenDungeon(Screen):
             with self.terminal.location(width_offset + unit.x, height_offset + unit.y):
                 print(unit.symbol, end='')
 
-    def __flush_screen(self) -> None:
-        print(self.terminal.clear + self.terminal.move_xy(0, self.terminal.height - 1), end='')
-    
     def update(self, *args: Any, **kwargs: Any) -> None:
         return super().update(*args, **kwargs)
 

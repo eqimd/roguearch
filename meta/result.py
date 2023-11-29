@@ -2,10 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class LoadDungeon:
-    path: str
-
-@dataclass
 class Fail:
     msg: str
 
@@ -21,4 +17,8 @@ class ForwardInput:
 class ChangeToPrevController:
     pass
 
-Result = ChangeToPrevController | LoadDungeon | ForwardInput | Ok | Fail
+@dataclass
+class ChangeToNextController:
+    pass
+
+Result = ChangeToNextController | ChangeToPrevController | ForwardInput | Ok | Fail

@@ -3,6 +3,7 @@ import json
 from typing import Any, Dict, List, Optional, Tuple
 
 from dungeon.dungeon import Dungeon
+from dungeon.inventory import Inventory
 from dungeon.units.enemy import Enemy
 from dungeon.units.hero import Hero, HeroAttributes
 from dungeon.units.unit import Unit
@@ -87,7 +88,7 @@ class DungeonLoader:
         if start is None:
             raise DungeonLoaderException('')
         # TODO: add means of loading a hero from state
-        hero = Hero(*start, HeroAttributes(0, 0, 0, 0, 0, 0))
+        hero = Hero(*start, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
         units.insert(0, hero)
 
         map = DungeonLoader.__items_to_map(rooms, doors, exits)

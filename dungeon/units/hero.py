@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from math import floor
 from typing import Any, List, cast
+from dungeon.inventory import Inventory
 
 from dungeon.units.effects.effect import Effect
 from dungeon.units.effects.effect_enum import EffectEnum
@@ -24,8 +25,10 @@ class HeroAttributes:
 class Hero(Unit):
     symbol_self = '@'
 
-    def __init__(self, pos_x: int, pos_y: int, attrs: HeroAttributes) -> None:
+    def __init__(self, pos_x: int, pos_y: int, attrs: HeroAttributes, inventory: Inventory) -> None:
         super().__init__(pos_x, pos_y)
+
+        self.inventory = inventory
 
         self.base_max_hp = 40
         self.base_max_mp = 10

@@ -21,3 +21,8 @@ class Controller(ABC):
     def prev_controller(self) -> Self:
         "Returns previos controller"
         pass
+
+    @abstractmethod
+    def next_controller(self) -> Self:
+        "Returns next controller to set"
+        pass

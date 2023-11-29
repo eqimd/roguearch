@@ -27,11 +27,6 @@ class ControllerMaster:
         cls.set_underlying_controller(ControllerMainMenu(cls.terminal, cls.controller))
 
     @classmethod
-    def set_controller_dungeon(cls, path: str) -> None:
-        dungeon = DungeonLoader.load(path)
-        cls.set_underlying_controller(ControllerDungeon(cls.terminal, dungeon, cls.controller))
-
-    @classmethod
     def set_controller_exit(cls) -> None:
         cls.set_underlying_controller(ControllerExit())
 
@@ -46,8 +41,8 @@ class ControllerMaster:
                 cls.set_controller_exit()
             case ForwardInput():
                 cls.__parse_key(key)
-            case LoadDungeon(path=path):
-                cls.set_controller_dungeon(path)
+            case ChangeToNextController():
+                cls.set_underlying_controller(cls.controller.next_controller())
             case ChangeToPrevController():
                 cls.set_underlying_controller(cls.controller.prev_controller())
 

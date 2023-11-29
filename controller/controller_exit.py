@@ -16,5 +16,8 @@ class ControllerExit(Controller):
     def prev_controller(self) -> Controller:
         return self
 
+    def next_controller(self) -> Controller:
+        return self
+
     def parse_key(self, key: str) -> Result:
         return Ok('')
