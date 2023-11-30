@@ -6,6 +6,8 @@ from dungeon.dungeon import Dungeon
 from dungeon.inventory import Inventory
 from dungeon.units.enemy import Enemy
 from dungeon.units.hero import Hero, HeroAttributes
+from dungeon.units.items.item import ItemOnScreen
+from dungeon.units.items.wearable.weapon import WeaponArthurSword
 from dungeon.units.unit import Unit
 
 import dungeon.tiles as Tiles
@@ -43,7 +45,8 @@ class DungeonLoader:
         exits: List[Tuple[int, int]] = list()
         units: List[Unit] = list()
 
-        dungeon = Dungeon([], None, [])
+        # TODO: items is a stub currently
+        dungeon = Dungeon([], [ItemOnScreen(WeaponArthurSword(), 1, 1)], None, [])
 
         for item in data:
             match item['type']:

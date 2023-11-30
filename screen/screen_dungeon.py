@@ -20,6 +20,10 @@ class ScreenDungeon(Screen):
                 with self.terminal.location(width_offset + idx, height_offset + idy):
                     print(tile, end = '')
 
+        for item in self.dungeon.items:
+            with self.terminal.location(width_offset + item.x, height_offset + item.y):
+                print(item.item.symbol, end='')
+
         for unit in self.dungeon.units:
             with self.terminal.location(width_offset + unit.x, height_offset + unit.y):
                 print(unit.symbol, end='')

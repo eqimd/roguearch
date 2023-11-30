@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 from math import floor
 from typing import Any, List, cast
-from dungeon.active_inventory import ActiveInventory
 from dungeon.inventory import Inventory
 
 from dungeon.units.effects.effect import Effect
 from dungeon.units.effects.effect_enum import EffectEnum
+from dungeon.units.items.item import Item
 from dungeon.units.items.item_enum import ItemEnum
 from dungeon.units.items.wearable.armor import Armor
 from dungeon.units.items.wearable.trinket import Trinket
-from dungeon.units.items.wearable.weapon import Weapon
+from dungeon.units.items.wearable.weapon import Weapon, WeaponFinka
 from dungeon.units.unit import Unit
 
 
@@ -28,10 +28,6 @@ class Hero(Unit):
 
     def __init__(self, pos_x: int, pos_y: int, attrs: HeroAttributes, inventory: Inventory) -> None:
         super().__init__(pos_x, pos_y)
-
-        # TODO: it is stub currently
-        self.active_inventory = ActiveInventory(Weapon(ItemEnum.Weapon, 0, [], 1, 1))
-        self.inventory = inventory
 
         self.base_max_hp = 40
         self.base_max_mp = 10
@@ -52,12 +48,25 @@ class Hero(Unit):
 
         # give at start or load from file?
         # TODO: consider item attributes in calculation (and add attribute effects on items)
-        self.weapon = Weapon(ItemEnum.Weapon, 0, list(), 0, 0)
+        # self.weapon = Weapon(ItemEnum.Weapon, 0, list(), 0, 0)
+
+        self.weapon: Weapon = WeaponFinka()
         self.armor = Armor(ItemEnum.UpperBody, 0, list(), 0, 0)
         self.amulet = Trinket(ItemEnum.Amulet, 0, list())
 
         # later add:
         # Inventory
+        # TODO: it is stub currently
+        self.inventory = inventory
+
+    def swap_item(self, item: Item) -> Item:
+        if isinstance(item, Weapon):
+            old_weapon = self.weapon
+            self.weapon = item
+            return old_weapon
+        
+        # TODO: return none?
+        return Item(0, 0)
 
     @property
     def symbol(self) -> str:

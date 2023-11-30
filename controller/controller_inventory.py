@@ -3,6 +3,7 @@ from blessed import Terminal
 from controller.controller import Controller
 from controller.controller_enum import ControllerEnum
 from dungeon.inventory import Inventory
+from dungeon.units.hero import Hero
 from meta.result import ChangeToPrevController, Ok, Result
 
 from screen.screen_inventory import ScreenInventory
@@ -11,10 +12,11 @@ from screen.screen_inventory import ScreenInventory
 class ControllerInventory(Controller):
     id = ControllerEnum.Inventory
 
-    def __init__(self, terminal: Terminal, inventory: Inventory, prev_controller: Controller):
-        self.screen = ScreenInventory(terminal, inventory)
+    def __init__(self, terminal: Terminal, hero: Hero, prev_controller: Controller):
+        self.screen = ScreenInventory(terminal, hero)
         self.terminal = terminal
-        self.inventory = inventory
+        self.hero = hero
+        self.inventory = hero.inventory
         self.prev_ctrl = prev_controller
 
         self.chosen_item_pos = (0, 0)
@@ -56,6 +58,20 @@ class ControllerInventory(Controller):
                 if x > 0:
                     self.__update_chosen_item_pos((-1, 0))
                     self.draw_screen()
+            case 'f':
+                x, y = self.chosen_item_pos
+                item_pos = y*Inventory.items_in_row + x
+
+                if item_pos >= len(self.inventory.items):
+                    return Ok('')
+
+                item = self.inventory.items[item_pos]
+
+                # TODO: if none?
+                old_item = self.hero.swap_item(item)
+                self.inventory.items[item_pos] = old_item
+
+                self.draw_screen()
 
         return Ok('')
     

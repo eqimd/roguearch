@@ -88,7 +88,7 @@ class Enemy(Unit):
             shuffle(moves)
 
             moves.sort(key=lambda move: self.calculate_distance(self.x + move[0], self.y + move[1], hero, units, tiles))
-            return Actions.MoveAction(self, moves[0], units, tiles)
+            return Actions.MoveAction(self, moves[0], self.dungeon)
 
     def __look_for_hero(self, hero: Hero, tiles: List[List[Tile]]) -> bool:
         # use obscuring to find out whether source can see target
