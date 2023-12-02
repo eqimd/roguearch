@@ -1,0 +1,59 @@
+[
+    {
+        "type": "room",
+        "top": 0,
+        "left": 0,
+        "bottom": 6,
+        "right": 14
+    },
+    {
+        "type": "door",
+        "x": 3,
+        "y": 14
+    },
+    {
+        "type": "room",
+        "top": 0,
+        "left": 14,
+        "bottom": 12,
+        "right": 20
+    },
+    {
+        "type": "start",
+        "x": 2,
+        "y": 3
+    },
+    {
+        "type": "exit",
+        "x": 10,
+        "y": 17
+    },
+    {
+        "type": "enemy",
+        "name": "basic",
+        "level": 0,
+        "x": 3,
+        "y": 6
+    },
+    {
+        "type": "enemy",
+        "name": "basic",
+        "level": 0,
+        "x": 2,
+        "y": 10
+    },
+    {
+        "type": "enemy",
+        "name": "basic",
+        "level": 0,
+        "x": 4,
+        "y": 10
+    },
+    {
+        "type": "enemy",
+        "name": "basic",
+        "level": 3,
+        "x": 7,
+        "y": 17
+    }
+]

@@ -1,43 +1,59 @@
+from controller.controller_dungeon import ControllerDungeon
+from dungeon.dungeon_loader import DungeonLoader
+from meta.result import *
+
 from blessed import Terminal
 
 from controller.controller import Controller
 from controller.controller_enum import ControllerEnum
-from meta.result import Result
 from screen.screen_main_menu import ScreenMainMenu
 
 
 class ControllerMainMenu(Controller):
     id = ControllerEnum.MainMenu
 
-    def __init__(self, terminal: Terminal) -> None:
+    def __init__(self, terminal: Terminal, prev_controller: Controller) -> None:
         super().__init__()
+        self.prev_ctrl: Controller = prev_controller
+        self.next_ctrl: Controller = self
+        self.terminal = terminal
         self.screen = ScreenMainMenu(terminal)
         self.selection = 0
 
     def draw_screen(self) -> None:
         self.screen.draw(self.selection)
 
-    def parse_key(self, key: str) -> Result:
-        res = Result()
+    def prev_controller(self) -> Controller:
+        return self.prev_ctrl
 
+    def next_controller(self) -> Controller:
+        return self.next_ctrl
+
+    def parse_key(self, key: str) -> Result:
         match key:
             case "w" | "KEY_UP":
                 new_selection = (self.selection - 1) % len(self.screen.menu_items)
                 self.screen.update(new_selection, self.selection)
                 self.selection = new_selection
+
+                return Ok("")
             case "s" | "KEY_DOWN":
                 new_selection = (self.selection + 1) % len(self.screen.menu_items)
                 self.screen.update(new_selection, self.selection)
                 self.selection = new_selection
+
+                return Ok("")
             case "KEY_ENTER":
                 match self.selection:
                     case 0:
                         # TODO: start the game
-                        pass
+                        return Fail("Not implemented")
                     case 1:
-                        # TODO: load the game
-                        pass
+                        dungeon = DungeonLoader.load('./assets/basic_map.json')
+                        self.next_ctrl = ControllerDungeon(self.terminal, dungeon, self)
+                        
+                        return ChangeToNextController()
+                    case _:
+                        return Fail("Unexpected") # should be never reached
             case _:
-                res.fail("Invalid input")
-
-        return res
+                return ForwardInput()

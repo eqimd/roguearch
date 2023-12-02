@@ -1,7 +1,10 @@
 from controller.controller import Controller
+from controller.controller_dungeon import ControllerDungeon
 from controller.controller_enum import ControllerEnum
 from controller.controller_exit import ControllerExit
-from meta.result import Result
+from controller.controller_main_menu import ControllerMainMenu
+from dungeon.dungeon_loader import DungeonLoader
+from meta.result import *
 
 from blessed import Terminal
 
@@ -10,9 +13,9 @@ class ControllerMaster:
     terminal: Terminal
     controller: Controller
 
-    def __init__(self, terminal: Terminal, cont: Controller) -> None:
+    def __init__(self, terminal: Terminal) -> None:
         ControllerMaster.terminal = terminal
-        ControllerMaster.set_underlying_controller(cont)
+        ControllerMaster.controller = ControllerExit()
 
     @classmethod
     def set_underlying_controller(cls, cont: Controller) -> None:
@@ -20,11 +23,28 @@ class ControllerMaster:
         cls.__flush_screen()
 
     @classmethod
+    def set_controller_main_menu(cls) -> None:
+        cls.set_underlying_controller(ControllerMainMenu(cls.terminal, cls.controller))
+
+    @classmethod
+    def set_controller_exit(cls) -> None:
+        cls.set_underlying_controller(ControllerExit())
+
+    @classmethod
     def forward_and_parse_on_not_ok(cls, key: str) -> Result:
         res = ControllerMaster.controller.parse_key(key)
 
-        if not res.ok and res.msg == 'Invalid input':
-            res = cls.__parse_key(key)
+        match res:
+            case Ok():
+                return res
+            case Fail():
+                cls.set_controller_exit()
+            case ForwardInput():
+                cls.__parse_key(key)
+            case ChangeToNextController():
+                cls.set_underlying_controller(cls.controller.next_controller())
+            case ChangeToPrevController():
+                cls.set_underlying_controller(cls.controller.prev_controller())
 
         return res
 
@@ -35,14 +55,8 @@ class ControllerMaster:
 
     @classmethod
     def __parse_key(cls, key: str) -> Result:
-        res = Result()
+        match key:
+            case "q" | "KEY_ESCAPE":
+                cls.set_controller_exit()
 
-        match ControllerMaster.controller.id:
-            case ControllerEnum.MainMenu:
-                match key:
-                    case "q" | "KEY_ESCAPE":
-                        cls.set_underlying_controller(ControllerExit())
-                    case _:
-                        res.fail('Invalid input')
-
-        return res
+        return Ok("")

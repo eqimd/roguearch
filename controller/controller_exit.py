@@ -1,6 +1,6 @@
 from controller.controller import Controller
 from controller.controller_enum import ControllerEnum
-from meta.result import Result
+from meta.result import Result, Ok
 
 
 # dummy controller to stop the game gracefully
@@ -13,5 +13,11 @@ class ControllerExit(Controller):
     def draw_screen(self) -> None:
         pass
 
+    def prev_controller(self) -> Controller:
+        return self
+
+    def next_controller(self) -> Controller:
+        return self
+
     def parse_key(self, key: str) -> Result:
-        return Result()
+        return Ok('')

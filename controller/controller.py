@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Self, Type
 
 from controller.controller_enum import ControllerEnum
 from meta.result import Result
@@ -13,5 +14,15 @@ class Controller(ABC):
 
     @abstractmethod
     def parse_key(self, key: str) -> Result:
-        "Exectues logic based on input key"
+        "Executes logic based on input key"
+        pass
+
+    @abstractmethod
+    def prev_controller(self) -> 'Controller':
+        "Returns previos controller"
+        pass
+
+    @abstractmethod
+    def next_controller(self) -> 'Controller':
+        "Returns next controller to set"
         pass
