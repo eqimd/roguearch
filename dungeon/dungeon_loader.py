@@ -1,7 +1,7 @@
 import json
-
 from typing import Any, Dict, List, Optional, Tuple
 
+import dungeon.tiles as Tiles
 from dungeon.dungeon import Dungeon
 from dungeon.inventory import Inventory
 from dungeon.units.enemy import Enemy
@@ -9,8 +9,6 @@ from dungeon.units.hero import Hero, HeroAttributes
 from dungeon.units.items.item import ItemOnScreen
 from dungeon.units.items.wearable.weapon import WeaponArthurSword
 from dungeon.units.unit import Unit
-
-import dungeon.tiles as Tiles
 
 
 class DungeonLoaderException(Exception):

@@ -14,8 +14,8 @@ class ControllerMainMenu(Controller):
 
     def __init__(self, terminal: Terminal, prev_controller: Controller) -> None:
         super().__init__()
-        self.prev_ctrl = prev_controller
-        self.next_ctrl = self
+        self.prev_ctrl: Controller = prev_controller
+        self.next_ctrl: Controller = self
         self.terminal = terminal
         self.screen = ScreenMainMenu(terminal)
         self.selection = 0

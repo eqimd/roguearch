@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from dungeon.tiles import Tile
 from dungeon.units.hero import Hero

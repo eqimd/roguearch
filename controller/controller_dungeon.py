@@ -29,6 +29,7 @@ class ControllerDungeon(Controller):
         return self.next_ctrl
     
     def parse_key(self, key: str) -> Result:
+        hero = self.dungeon.hero
         match key:
             case 'w':
                 hero = self.dungeon.hero
@@ -92,5 +93,5 @@ class ControllerDungeon(Controller):
         self.screen.draw_msg(hero_res.msg)
 
 
-    def set_underlying_dungeon(self, dungeon: Dungeon):
+    def set_underlying_dungeon(self, dungeon: Dungeon) -> None:
         self.dungeon = dungeon

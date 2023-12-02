@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing import Self, Type
 
 from controller.controller_enum import ControllerEnum
 from meta.result import Result
@@ -18,11 +18,11 @@ class Controller(ABC):
         pass
 
     @abstractmethod
-    def prev_controller(self) -> Self:
+    def prev_controller(self) -> 'Controller':
         "Returns previos controller"
         pass
 
     @abstractmethod
-    def next_controller(self) -> Self:
+    def next_controller(self) -> 'Controller':
         "Returns next controller to set"
         pass

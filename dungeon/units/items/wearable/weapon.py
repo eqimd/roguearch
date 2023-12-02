@@ -9,9 +9,9 @@ class Weapon(WearableItem):
     damage: int
     magic: int
 
-    symbol_self = '!'
+    symbol_self: str = '!'
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.id = ItemEnum.Weapon
 
     def symbol(self) -> str:
