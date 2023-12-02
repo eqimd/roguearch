@@ -44,7 +44,9 @@ class DungeonLoader:
         units: List[Unit] = list()
 
         # TODO: items is a stub currently
-        dungeon = Dungeon([], [ItemOnScreen(WeaponArthurSword(), 1, 1)], None, [])
+        # TODO: hero is stub here
+        hero_stub = Hero(0, 0, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
+        dungeon = Dungeon([], [ItemOnScreen(WeaponArthurSword(), 1, 1)], hero_stub, [])
 
         for item in data:
             match item['type']:

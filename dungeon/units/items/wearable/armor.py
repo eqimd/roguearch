@@ -10,3 +10,11 @@ class Armor(WearableItem):
     armor: int
     firmness: int
     effects: List[Effect]
+
+    @property
+    def symbol(self) -> str:
+        return "X"
+
+    @property
+    def description(self) -> str:
+        return "Armor"

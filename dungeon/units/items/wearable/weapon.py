@@ -14,6 +14,7 @@ class Weapon(WearableItem):
     def __init__(self) -> None:
         self.id = ItemEnum.Weapon
 
+    @property
     def symbol(self) -> str:
         return Weapon.symbol_self
 

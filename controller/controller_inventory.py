@@ -69,7 +69,8 @@ class ControllerInventory(Controller):
 
                 # TODO: if none?
                 old_item = self.hero.swap_item(item)
-                self.inventory.items[item_pos] = old_item
+                if old_item is not None:
+                    self.inventory.items[item_pos] = old_item
 
                 self.draw_screen()
 

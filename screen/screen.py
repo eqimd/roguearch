@@ -17,5 +17,5 @@ class Screen(ABC):
         pass
 
     @classmethod
-    def flush(cls, terminal: Terminal):
+    def flush(cls, terminal: Terminal) -> None:
         print(terminal.clear + terminal.move_xy(0, terminal.height - 1), end='')

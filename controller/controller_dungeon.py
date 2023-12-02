@@ -14,7 +14,7 @@ class ControllerDungeon(Controller):
     def __init__(self, terminal: Terminal, dungeon: Dungeon, prev_controller: Controller):
         super().__init__
         self.prev_ctrl = prev_controller
-        self.next_ctrl = self
+        self.next_ctrl: Controller = self
         self.screen = ScreenDungeon(terminal, dungeon)
         self.terminal = terminal
         self.set_underlying_dungeon(dungeon)

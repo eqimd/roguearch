@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from math import floor
-from typing import Any, List, cast
+from typing import Any, List, cast, Optional
 from dungeon.inventory import Inventory
 
 from dungeon.units.effects.effect import Effect
@@ -59,14 +59,14 @@ class Hero(Unit):
         # TODO: it is stub currently
         self.inventory = inventory
 
-    def swap_item(self, item: Item) -> Item:
+    def swap_item(self, item: Item) -> Optional[Item]:
         if isinstance(item, Weapon):
             old_weapon = self.weapon
             self.weapon = item
             return old_weapon
         
         # TODO: return none?
-        return Item(0, 0)
+        return None
 
     @property
     def symbol(self) -> str:

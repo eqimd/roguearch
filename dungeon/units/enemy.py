@@ -56,7 +56,8 @@ class Enemy(Unit):
     def perform_action(self) -> ActionResult:
         action = self.generate_action(self.dungeon.hero, self.dungeon.units, self.dungeon.map)
 
-        self.set_action(action)
+        if action is not None:
+            self.set_action(action)
 
         return super().perform_action()
 
