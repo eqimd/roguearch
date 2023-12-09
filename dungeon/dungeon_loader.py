@@ -8,6 +8,7 @@ from dungeon.units.enemy import Enemy
 from dungeon.units.hero import Hero, HeroAttributes
 from dungeon.units.items.item import ItemOnScreen
 from dungeon.units.items.wearable.weapon import WeaponArthurSword
+from dungeon.units.mobs.mob import Mob
 from dungeon.units.unit import Unit
 
 
@@ -87,6 +88,23 @@ class DungeonLoader:
                         case _:
                             raise DungeonLoaderException('Tried to create enemy of unknown type', item)
 
+                case "mob":
+                    mob_name = item.get('name')
+                    match mob_name:
+                        case "basic":
+                            try:
+                                units.append(
+                                    Mob.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
+                            except KeyError:
+                                raise DungeonLoaderException('Could not parse an mob item', item)
+                        case "strateg":
+                            try:
+                                units.append(
+                                    Mob.make_mob_with_strategy_by_level(dungeon, item['x'], item['y'], item['level'], item['strategy']))
+                            except KeyError:
+                                raise DungeonLoaderException('Could not parse an mob item', item)
+                        case _:
+                            raise DungeonLoaderException('Tried to create mob of unknown type', item)
                 case _:
                     raise DungeonLoaderException('Unknown type encountered during map loading', item)
 

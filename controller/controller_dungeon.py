@@ -1,9 +1,12 @@
+from time import sleep
+
 from blessed import Terminal
 from controller.controller import Controller
 from controller.controller_enum import ControllerEnum
 from controller.controller_inventory import ControllerInventory
 from dungeon.dungeon import Dungeon
 from dungeon.units.actions.actions import MoveAction, PickupAction
+from dungeon.units.mobs.base_mob import BaseMob
 from meta.result import ChangeToNextController, ChangeToPrevController, ForwardInput, Ok, Result
 from screen.screen_dungeon import ScreenDungeon
 
@@ -85,13 +88,16 @@ class ControllerDungeon(Controller):
     def perform_game_move(self) -> None:
         hero_res = self.dungeon.hero.perform_action()
 
-        # TODO: it's broken currently
-        # for unit in self.dungeon.units:
-        #     unit.perform_action()
+        strs = []
+        for unit in self.dungeon.units:
+            if issubclass(type(unit), BaseMob):
+                strs.append(unit.perform_action().msg)
+
+        self.dungeon.units = list(filter(lambda u: u.have_hp(), self.dungeon.units))
 
         self.draw_screen()
         self.screen.draw_msg(hero_res.msg)
-
+        print(strs)
 
     def set_underlying_dungeon(self, dungeon: Dungeon) -> None:
         self.dungeon = dungeon

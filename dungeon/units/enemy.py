@@ -79,7 +79,7 @@ class Enemy(Unit):
 
             # enemy was not distrubed, continue the same action
             if not found:
-                return self.action
+                return self.__action
 
         if self.calculate_distance_self(hero, units, tiles) < 2:
             return Actions.AttackAction(self, hero)
