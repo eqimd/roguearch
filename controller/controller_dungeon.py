@@ -1,9 +1,12 @@
+from typing import Optional
+
 from blessed import Terminal
 from controller.controller import Controller
 from controller.controller_enum import ControllerEnum
 from controller.controller_inventory import ControllerInventory
 from dungeon.dungeon import Dungeon
 from dungeon.units.actions.actions import MoveAction, PickupAction
+from dungeon.units.mobs.base_mob import BaseMob
 from meta.result import ChangeToNextController, ChangeToPrevController, ForwardInput, Ok, Result
 from screen.screen_dungeon import ScreenDungeon
 
@@ -35,28 +38,36 @@ class ControllerDungeon(Controller):
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (0, -1), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 's':
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (0, 1), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 'a':
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (-1, 0), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 'd':
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (1, 0), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 'q':
@@ -82,16 +93,21 @@ class ControllerDungeon(Controller):
         return ForwardInput()
     
 
-    def perform_game_move(self) -> None:
+    def perform_game_move(self) -> Optional[Result]:
         hero_res = self.dungeon.hero.perform_action()
 
-        # TODO: it's broken currently
-        # for unit in self.dungeon.units:
-        #     unit.perform_action()
+        strs = []
+        for unit in self.dungeon.units:
+            if issubclass(type(unit), BaseMob):
+                strs.append(unit.perform_action().msg)
+
+        self.dungeon.units = list(filter(lambda u: u.have_hp(), self.dungeon.units))
 
         self.draw_screen()
         self.screen.draw_msg(hero_res.msg)
 
+        if not self.dungeon.hero.have_hp():
+            return ChangeToPrevController()
 
     def set_underlying_dungeon(self, dungeon: Dungeon) -> None:
         self.dungeon = dungeon

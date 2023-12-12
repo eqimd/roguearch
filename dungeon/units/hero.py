@@ -59,6 +59,9 @@ class Hero(Unit):
         # TODO: it is stub currently
         self.inventory = inventory
 
+        self.exp_points = 0
+        self.level = 1
+
     def swap_item(self, item: Item) -> Optional[Item]:
         if isinstance(item, Weapon):
             old_weapon = self.weapon
@@ -68,6 +71,21 @@ class Hero(Unit):
         # TODO: return none?
         return None
 
+    def add_exp_points(self, points: int):
+        self.exp_points += points
+        while self.exp_points >= 4:
+            self.exp_points -= 4
+            self.update_level()
+
+    def update_level(self):
+        self.level += 1
+        self.base_attack += 1
+        self.base_magic += 1
+        self.base_accuracy += 1
+        self.base_dodge += 1
+        self.base_resistance += 1
+        self.base_max_weight += 1
+
     @property
     def symbol(self) -> str:
         return Hero.symbol_self
@@ -75,15 +93,15 @@ class Hero(Unit):
     @property
     def max_hp(self) -> int:
         base = self.base_max_hp + 5 * self.attrs.vitality
-        shifted = cast(int, self.__apply_effects(EffectEnum.HPOffset, base))
-        multiplier = cast(float, self.__apply_effects(EffectEnum.HPMultiplier, 1))
+        shifted = cast(int, self.__apply_effects(EffectEnum.HPOffset, base)[0])
+        multiplier = cast(float, self.__apply_effects(EffectEnum.HPMultiplier, 1)[0])
         return floor(shifted * multiplier)
 
     @property
     def max_mp(self) -> int:
         base = self.base_max_hp + 2 * self.attrs.intelligence
-        shifted = cast(int, self.__apply_effects(EffectEnum.MPOffset, base))
-        multiplier = cast(float, self.__apply_effects(EffectEnum.MPMultiplier, 1))
+        shifted = cast(int, self.__apply_effects(EffectEnum.MPOffset, base)[0])
+        multiplier = cast(float, self.__apply_effects(EffectEnum.MPMultiplier, 1)[0])
         return floor(shifted * multiplier)
 
     @property
@@ -93,7 +111,7 @@ class Hero(Unit):
     @property
     def crit_chance(self) -> float:
         base_no_crit = 1 - Hero.__crit_value_to_chance(self.__accuracy)
-        modifier_no_crit = cast(float, self.__apply_effects(EffectEnum.CritMultiplier, 1))
+        modifier_no_crit = cast(float, self.__apply_effects(EffectEnum.CritMultiplier, 1)[0])
         return 1 - base_no_crit * modifier_no_crit
 
     @property
@@ -108,13 +126,13 @@ class Hero(Unit):
     @property
     def dodge_chance(self) -> float:
         base_no_dodge = 1 - Hero.__dodge_value_to_chance(self.__dodge)
-        modifier_no_dodge = cast(float, self.__apply_effects(EffectEnum.DodgeMultiplier, 1))
+        modifier_no_dodge = cast(float, self.__apply_effects(EffectEnum.DodgeMultiplier, 1)[0])
         return 1 - base_no_dodge * modifier_no_dodge
 
     # currently unused
     @property
     def bleed_resistance(self) -> float:
-        modifier_no_resist = cast(float, self.__apply_effects(EffectEnum.BleedResMultiplier, 1))
+        modifier_no_resist = cast(float, self.__apply_effects(EffectEnum.BleedResMultiplier, 1)[0])
         base_no_resist = 1 - Hero.__resistance_value_to_chance(self.__resistance)
         return 1 - base_no_resist * modifier_no_resist
 
@@ -122,20 +140,20 @@ class Hero(Unit):
     @property
     def poison_resistance(self) -> float:
         base_no_resist = 1 - Hero.__resistance_value_to_chance(self.__resistance)
-        modifier_no_resist = cast(float, self.__apply_effects(EffectEnum.PoisonResMultiplier, 1))
+        modifier_no_resist = cast(float, self.__apply_effects(EffectEnum.PoisonResMultiplier, 1)[0])
         return 1 - base_no_resist * modifier_no_resist
 
     # currently unused
     @property
     def debuff_resistance(self) -> float:
         base_no_resist = 1 - Hero.__resistance_value_to_chance(self.__resistance)
-        modifier_no_resist = cast(float, self.__apply_effects(EffectEnum.DebuffResMultiplier, 1))
+        modifier_no_resist = cast(float, self.__apply_effects(EffectEnum.DebuffResMultiplier, 1)[0])
         return 1 - base_no_resist * modifier_no_resist
 
     @property
     def __accuracy(self) -> int:
         base = self.base_accuracy + self.attrs.perception
-        shifted = cast(int, self.__apply_effects(EffectEnum.AccOffset, base))
+        shifted = cast(int, self.__apply_effects(EffectEnum.AccOffset, base)[0])
         return shifted
 
     @property

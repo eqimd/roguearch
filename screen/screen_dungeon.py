@@ -54,7 +54,13 @@ class ScreenDungeon(Screen):
 
     def __draw_hero_stats(self) -> None:
         with self.terminal.location(self.terminal.width - 30, self.__get_height_offset()):
-            print(f'Damage: {self.dungeon.hero.weapon.damage}', end='')
+            print(f'Damage level: {self.dungeon.hero.weapon.damage}', end='\n')
+        with self.terminal.location(self.terminal.width - 30, self.__get_height_offset() + 1):
+            print(f'Dodge chance: {self.dungeon.hero.dodge_chance}', end='\n')
+        with self.terminal.location(self.terminal.width - 30, self.__get_height_offset() + 2):
+            print(f'Health: {self.dungeon.hero.hp}', end='\n')
+        with self.terminal.location(self.terminal.width - 30, self.__get_height_offset() + 3):
+            print(f'Level: {self.dungeon.hero.level}', end='\n')
 
     def __get_width_offset(self) -> int:
         return (self.terminal.width - len(self.dungeon.map)) // 2

@@ -29,29 +29,33 @@
         "y": 17
     },
     {
-        "type": "enemy",
-        "name": "basic",
+        "type": "mob",
+        "name": "strateg",
+        "strategy": "aggressive",
         "level": 0,
         "x": 3,
         "y": 6
     },
     {
-        "type": "enemy",
-        "name": "basic",
+        "type": "mob",
+        "name": "strateg",
+        "strategy": "passive",
         "level": 0,
         "x": 2,
         "y": 10
     },
     {
-        "type": "enemy",
-        "name": "basic",
+        "type": "mob",
+        "name": "strateg",
+        "strategy": "coward",
         "level": 0,
         "x": 4,
         "y": 10
     },
     {
-        "type": "enemy",
-        "name": "basic",
+        "type": "mob",
+        "name": "strateg",
+        "strategy": "aggressive",
         "level": 3,
         "x": 7,
         "y": 17
