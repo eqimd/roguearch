@@ -1,4 +1,4 @@
-from time import sleep
+from typing import Optional
 
 from blessed import Terminal
 from controller.controller import Controller
@@ -38,28 +38,36 @@ class ControllerDungeon(Controller):
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (0, -1), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 's':
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (0, 1), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 'a':
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (-1, 0), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 'd':
                 hero = self.dungeon.hero
                 hero.set_action(MoveAction(hero, (1, 0), self.dungeon))
 
-                self.perform_game_move()
+                res = self.perform_game_move()
+                if res != None:
+                    return res
 
                 return Ok('')
             case 'q':
@@ -85,7 +93,7 @@ class ControllerDungeon(Controller):
         return ForwardInput()
     
 
-    def perform_game_move(self) -> None:
+    def perform_game_move(self) -> Optional[Result]:
         hero_res = self.dungeon.hero.perform_action()
 
         strs = []
@@ -97,7 +105,9 @@ class ControllerDungeon(Controller):
 
         self.draw_screen()
         self.screen.draw_msg(hero_res.msg)
-        print(strs)
+
+        if not self.dungeon.hero.have_hp():
+            return ChangeToPrevController()
 
     def set_underlying_dungeon(self, dungeon: Dungeon) -> None:
         self.dungeon = dungeon
