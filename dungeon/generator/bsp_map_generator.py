@@ -2,7 +2,7 @@ from blessed import Terminal
 from dataclasses import dataclass
 from time import sleep
 from numpy.random import poisson
-from random import randint
+from random import randint, choice
 from typing import List, Tuple, Optional, cast
 
 from dungeon.generator.map_generator import MapGenerator
@@ -35,43 +35,12 @@ class BSPMapGenerator(MapGenerator):
         self.map_size = map_size
         self.rooms_amount = rooms_amount
         self.room_size_factor = room_size_factor
+        self.cells: List[Cell] = list()
 
     def make_floor(self):
-        cells: List[Cell] = list()
-        cells.append(Cell(0, 0, self.map_size - 1, self.map_size - 1, 0))
-
-        rooms = 1
-        idx = 0
-        while rooms < self.rooms_amount:
-            print(rooms, idx)
-            if idx >= len(cells):
-                break
-
-            cell_to_split = cells[idx]
-
-            # even depth: split vertically, odd depth: split horizontally
-            if cell_to_split.depth % 2:
-                try:
-                    split = randint(cell_to_split.top + 7, cell_to_split.bottom - 7)
-                except:
-                    idx += 1
-                    continue
-                cells.append(Cell(cell_to_split.top, cell_to_split.left, split, cell_to_split.right, cell_to_split.depth + 1))
-                cells.append(Cell(split, cell_to_split.left, cell_to_split.bottom, cell_to_split.right, cell_to_split.depth + 1))
-                cell_to_split.children = (len(cells) - 2, len(cells) - 1)
-            else:
-                try:
-                    split = randint(cell_to_split.left + 5, cell_to_split.right - 5)
-                except:
-                    idx += 1
-                    continue
-                cells.append(Cell(cell_to_split.top, cell_to_split.left, cell_to_split.bottom, split, cell_to_split.depth + 1))
-                cells.append(Cell(cell_to_split.top, split, cell_to_split.bottom, cell_to_split.right, cell_to_split.depth + 1))
-                cell_to_split.children = (len(cells) - 2, len(cells) - 1)
-            rooms += 1
-            idx += 1
+        self.__make_cells()
         
-        for cell in cells:
+        for cell in self.cells:
             if cell.children is None:
                 # width_x = randint(3, cell.right - cell.left - 1)
                 # width_y = randint(3, cell.bottom - cell.top - 1)
@@ -81,17 +50,17 @@ class BSPMapGenerator(MapGenerator):
                 top = randint(cell.top + 1, cell.bottom - width_y)
                 cell.room = Room(top, left, top + width_y - 1, left + width_x - 1)
         
-        for cell in cells:
+        for cell in self.cells:
             if cell.room is not None:
                 for y in range(cell.room.top, cell.room.bottom + 1):
                     for x in range(cell.room.left, cell.room.right + 1):
                         self.tiles[x][y] = Tiles.Floor
 
-        for idx in range(len(cells) - 1, -1, -1):
-            parent_cell = cells[idx]
+        for idx in range(len(self.cells) - 1, -1, -1):
+            parent_cell = self.cells[idx]
             if parent_cell.children is not None:
-                child_left = cells[parent_cell.children[0]]
-                child_right = cells[parent_cell.children[1]]
+                child_left = self.cells[parent_cell.children[0]]
+                child_right = self.cells[parent_cell.children[1]]
                 child_left_room = cast(Room, child_left.room)
                 child_right_room = cast(Room, child_right.room)
                 
@@ -205,6 +174,85 @@ class BSPMapGenerator(MapGenerator):
             for x in range(self.map_size):
                 if self.tiles[x][y] == Tiles.Empty and self.__has_floor_nearby(y, x, self.map_size):
                     self.tiles[x][y] = Tiles.Wall
+
+    def make_start_exit_positions(self):
+        leaves_left = (
+            self.__get_leaves(self.cells[0].children[0])
+            if self.cells[0].children is not None
+            else [0]
+        )
+        leaves_right = (
+            self.__get_leaves(self.cells[0].children[1])
+            if self.cells[0].children is not None
+            else [0]
+        )
+
+        start_leaf = choice(leaves_left)
+        if len(leaves_right) == 1 and leaves_right[0] == start_leaf:
+            end_leaf = start_leaf
+        else:
+            while True:
+                end_leaf = choice(leaves_right)
+                if start_leaf != end_leaf:
+                    break
+
+        start_point = self.__get_random_point_in_room(start_leaf)
+        while True:
+            end_point = self.__get_random_point_in_room(end_leaf)
+            if start_point != end_point:
+                break
+
+        self.start_point = start_point
+        self.end_point = end_point
+
+    def __get_random_point_in_room(self, cell_idx) -> Tuple[int, int]:
+        return (
+            randint(self.cells[cell_idx].room.left, self.cells[cell_idx].room.right),
+            randint(self.cells[cell_idx].room.top, self.cells[cell_idx].room.bottom),
+        )
+    
+    def __get_leaves(self, cell_idx) -> List[int]:
+        print(cell_idx)
+        if self.cells[cell_idx].children is None:
+            return [cell_idx]
+        
+        leaves = self.__get_leaves(self.cells[cell_idx].children[0])
+        leaves.extend(self.__get_leaves(self.cells[cell_idx].children[1]))
+        return leaves
+    
+    def __make_cells(self):
+        self.cells.append(Cell(0, 0, self.map_size - 1, self.map_size - 1, 0))
+
+        rooms = 1
+        idx = 0
+        while rooms < self.rooms_amount:
+            print(rooms, idx)
+            if idx >= len(self.cells):
+                break
+
+            cell_to_split = self.cells[idx]
+
+            # even depth: split vertically, odd depth: split horizontally
+            if cell_to_split.depth % 2:
+                try:
+                    split = randint(cell_to_split.top + 7, cell_to_split.bottom - 7)
+                except:
+                    idx += 1
+                    continue
+                self.cells.append(Cell(cell_to_split.top, cell_to_split.left, split, cell_to_split.right, cell_to_split.depth + 1))
+                self.cells.append(Cell(split, cell_to_split.left, cell_to_split.bottom, cell_to_split.right, cell_to_split.depth + 1))
+                cell_to_split.children = (len(self.cells) - 2, len(self.cells) - 1)
+            else:
+                try:
+                    split = randint(cell_to_split.left + 5, cell_to_split.right - 5)
+                except:
+                    idx += 1
+                    continue
+                self.cells.append(Cell(cell_to_split.top, cell_to_split.left, cell_to_split.bottom, split, cell_to_split.depth + 1))
+                self.cells.append(Cell(cell_to_split.top, split, cell_to_split.bottom, cell_to_split.right, cell_to_split.depth + 1))
+                cell_to_split.children = (len(self.cells) - 2, len(self.cells) - 1)
+            rooms += 1
+            idx += 1
 
     def __get_l_shape_orientation(self, center_x, center_y, map_size) -> int:
         tl, t, tr, l, c, r, bl, b, br = self.__get_tile_square(center_x, center_y, map_size)

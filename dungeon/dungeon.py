@@ -10,8 +10,7 @@ class Dungeon:
     # should have units (and be able to make them perform actions),
     # entities (items) and a tile map
     def __init__(self, map: List[List[Tile]], items: List[ItemOnScreen], hero: Hero, units: List[Unit]):
-        # TODO: add units too
+        self.map = map
         self.items = items
         self.hero = hero
-        self.map = map
         self.units = units
