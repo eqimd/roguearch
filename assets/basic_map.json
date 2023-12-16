@@ -30,7 +30,7 @@
     },
     {
         "type": "mob",
-        "name": "strateg",
+        "name": "strategist",
         "strategy": "aggressive",
         "level": 0,
         "x": 3,
@@ -38,7 +38,7 @@
     },
     {
         "type": "mob",
-        "name": "strateg",
+        "name": "strategist",
         "strategy": "passive",
         "level": 0,
         "x": 2,
@@ -46,7 +46,7 @@
     },
     {
         "type": "mob",
-        "name": "strateg",
+        "name": "strategist",
         "strategy": "coward",
         "level": 0,
         "x": 4,
@@ -54,7 +54,7 @@
     },
     {
         "type": "mob",
-        "name": "strateg",
+        "name": "strategist",
         "strategy": "aggressive",
         "level": 3,
         "x": 7,

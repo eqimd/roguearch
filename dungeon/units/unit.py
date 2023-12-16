@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Set
 
 from dungeon.units.actions.action import Action
 from dungeon.tiles import Tile
 from dungeon.units.actions.action_result import ActionResult, Fail
 from dungeon.units.entity import Entity
+# from dungeon.units.mobs.mob import Mob
 
 
 class Unit(Entity):
@@ -22,16 +23,24 @@ class Unit(Entity):
         self.__action = action
 
     def perform_action(self) -> ActionResult:
-        return self.__action.perform() if self.__action is not None else Fail('Action not set')
+        if self.__action is None:
+            return Fail('Action not set')
 
-    def calculate_distance_self(self, other: Unit, units: List[Unit], tiles: List[List[Tile]]) -> int:
+        result = self.__action.perform()
+        self.__action = None
+        return result
+
+    def calculate_distance_self(self, other: Unit, units, tiles: List[List[Tile]]) -> int:
         return Unit.calculate_distance(self.x, self.y, other, units, tiles)
 
     @staticmethod
-    def calculate_distance(pos_x: int, pos_y: int, other: Unit, units: List[Unit], tiles: List[List[Tile]]) -> int:
+    def calculate_distance(pos_x: int, pos_y: int, other: Unit, units, tiles: List[List[Tile]]) -> int:
         start = (pos_x, pos_y)
-        used = set(start)
-        s_queue: List[Tuple[Tuple[int, int], int]] = [(start, 0)]
+        used: Set[Tuple[int, int]] = set()
+        s_queue: List[Tuple[Tuple[int, int], int]] = list()
+
+        used.add(start)
+        s_queue.append((start, 0))
         t = (other.x, other.y)
 
         while s_queue:

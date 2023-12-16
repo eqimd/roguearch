@@ -22,7 +22,7 @@ class ScreenDungeon(Screen):
         width_offset = self.__get_width_offset()
         height_offset = self.__get_height_offset()
 
-        for idx, row in enumerate(self.dungeon.map):
+        for idx, row in enumerate(self.dungeon.tiles):
             for idy, tile in enumerate(row):
                 with self.terminal.location(width_offset + idx, height_offset + idy):
                     print(tile, end = '')
@@ -63,10 +63,10 @@ class ScreenDungeon(Screen):
             print(f'Level: {self.dungeon.hero.level}', end='\n')
 
     def __get_width_offset(self) -> int:
-        return (self.terminal.width - len(self.dungeon.map)) // 2
+        return (self.terminal.width - len(self.dungeon.tiles)) // 2
 
     def __get_height_offset(self) -> int:
-        return (self.terminal.height - len(self.dungeon.map[0])) // 2
+        return (self.terminal.height - len(self.dungeon.tiles[0])) // 2
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         return super().update(*args, **kwargs)

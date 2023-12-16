@@ -8,7 +8,7 @@ from dungeon.dungeon import Dungeon
 from dungeon.tiles import Tile
 from dungeon.units.actions.action import Action
 from dungeon.units.actions.action_result import ActionResult, Fail
-from dungeon.units.hero import Hero
+# from dungeon.units.hero import Hero
 from dungeon.units.mobs.base_mob import BaseMob
 from dungeon.units.unit import Unit
 
@@ -16,17 +16,16 @@ import dungeon.units.actions.actions as Actions
 
 
 class MobStrategy(ABC):
-
     def __init__(self, mob: Mob):
         self.mob = mob
 
     @abstractmethod
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[Mob], tiles: List[List[Tile]]) -> Optional[Action]:
         return NotImplemented
 
 
 class BasicStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[Mob], tiles: List[List[Tile]]) -> Optional[Action]:
         """
                 Primitive behaviour: attack if close
                 to the hero, come closer if not
@@ -51,7 +50,7 @@ class BasicStrategy(MobStrategy):
 
 # Аггресивная стратегия -- всегда когда моб видит героя -- атакует его, иначе пытается двигаться в сторону игрока
 class AggressiveStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[Mob], tiles: List[List[Tile]]) -> Optional[Action]:
         if self.mob.hero_seen:
             return Actions.AttackAction(self.mob, hero)
         else:
@@ -61,20 +60,23 @@ class AggressiveStrategy(MobStrategy):
             ))
             shuffle(moves)
 
-            moves.sort(key=lambda move: self.mob.calculate_distance(
-                self.mob.x + move[0], self.mob.y + move[1], hero, units, tiles))
+            moves.sort(
+                key=lambda move: self.mob.calculate_distance(
+                    self.mob.x + move[0], self.mob.y + move[1], hero, units, tiles
+                )
+            )
             return Actions.MoveAction(self.mob, moves[0], self.mob.dungeon)
 
 
 # Стратегия ничего не делать
 class PassiveStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[Mob], tiles: List[List[Tile]]) -> Optional[Action]:
         return None
 
 
 # Стратегия пытаться убежать от героя
 class CowardStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[Mob], tiles: List[List[Tile]]) -> Optional[Action]:
         moves = list(filter(
             lambda p: not tiles[self.mob.x + p[0]][self.mob.y + p[1]].colliding,
             [(x_diff, y_diff) for x_diff in [-1, 0, 1] for y_diff in [-1, 0, 1]]
@@ -132,9 +134,9 @@ class Mob(Unit, BaseMob):
         self.strategy: MobStrategy = self.__make_strategy_by_name(strategy_name)
 
     def perform_action(self) -> ActionResult:
-        self.hero_seen = self.__look_for_hero(self.dungeon.hero, self.dungeon.map)
+        self.hero_seen = self.__look_for_hero(self.dungeon.hero, self.dungeon.tiles)
 
-        action = self.strategy.generate_action(self.dungeon.hero, self.dungeon.units, self.dungeon.map)
+        action = self.strategy.generate_action(self.dungeon.hero, self.dungeon.units, self.dungeon.tiles)
 
         if action is not None:
             self.set_action(action)
@@ -186,7 +188,7 @@ class Mob(Unit, BaseMob):
     def symbol(self) -> str:
         return Mob.symbol_seen if self.hero_seen else Mob.symbol_not_seen
 
-    def __look_for_hero(self, hero: Hero, tiles: List[List[Tile]]) -> bool:
+    def __look_for_hero(self, hero, tiles: List[List[Tile]]) -> bool:
         # use obscuring to find out whether source can see target
         points = [(hero.x, hero.y)]
 
@@ -294,3 +296,7 @@ class Mob(Unit, BaseMob):
     @property
     def debuff_resistance(self) -> float:
         return self.__debuff_resistance
+
+    @property
+    def name(self) -> str:
+        return 'Unnamed'

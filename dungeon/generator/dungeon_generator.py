@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple
+from dungeon.dungeon import Dungeon
 
 import dungeon.tiles as Tiles
+from dungeon.units.hero import Hero
+from dungeon.units.mobs.mob_factory import MobFactory
 
 
-class MapGeneratorException(Exception):
+class DungeonGeneratorException(Exception):
     def __init__(self, message: Optional[str] = None) -> None:
         self.message = message
 
@@ -17,10 +20,15 @@ class MapGeneratorException(Exception):
         return msg
 
 
-class MapGenerator(ABC):
+class DungeonGenerator(ABC):
     @abstractmethod
-    def __init__(self, map_size_x, map_size_y):
-        self.tiles = [[Tiles.Empty]*map_size_x for _ in range(map_size_y)]
+    def __init__(self, map_size_x: int, map_size_y: int, hero: Hero):
+        self.dungeon = Dungeon(
+            [[Tiles.Empty]*map_size_x for _ in range(map_size_y)],
+            hero,
+            list(),
+            list()
+        )
 
         self.start_point: Optional[Tuple[int, int]] = None
         self.end_point: Optional[Tuple[int, int]] = None
@@ -44,3 +52,16 @@ class MapGenerator(ABC):
     def make_start_exit_positions(self) -> None:
         """Function dedicated to placing wall tiles"""
         pass
+
+    @abstractmethod
+    def make_exit(self) -> None:
+        """Function dedicated to placing mobs on the map"""
+        pass
+
+    @abstractmethod
+    def place_mobs(self, mob_factory: MobFactory, level: int) -> None:
+        """Function dedicated to placing mobs on the map"""
+        pass
+
+    def get_dungeon(self):
+        return self.dungeon

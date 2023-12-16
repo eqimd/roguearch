@@ -85,12 +85,12 @@ class MoveAction(Action):
         if next_pos == (self.dungeon.hero.x, self.dungeon.hero.y):
             return AttackAction(self.source, self.dungeon.hero).perform()
 
-        if self.dungeon.map[next_pos[0]][next_pos[1]].colliding:
+        if self.dungeon.tiles[next_pos[0]][next_pos[1]].colliding:
             return Fail('Tried to move to a colliding tile')
 
         self.source.x, self.source.y = next_pos
 
-        if self.dungeon.map[self.source.x][self.source.y] is Exit:
+        if self.dungeon.tiles[self.source.x][self.source.y] is Exit:
             return Ok('You WIN!')
 
         item = next((itm for itm in self.dungeon.items if itm.x == next_pos[0] and itm.y == next_pos[1]), None)
