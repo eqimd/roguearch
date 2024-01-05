@@ -10,7 +10,7 @@ from dungeon.units.actions.action_result import ActionResult, Fail, Ok
 from dungeon.units.hero import Hero
 from dungeon.units.items.item import Item, ItemOnScreen
 from dungeon.units.mobs.base_mob import BaseMob
-from dungeon.units.mobs.mob import Mob
+from dungeon.units.mobs.mob_prototype import MobPrototype
 from dungeon.units.unit import Unit
 
 
@@ -53,12 +53,12 @@ class AttackAction(Action):
         self.target.hp = max(self.target.hp - actual_damage, 0)
 
         if self.target.hp == 0 and issubclass(type(self.source), Hero):
-            exp_points = cast(Mob, self.target).exp_points
+            exp_points = cast(MobPrototype, self.target).exp_points
             cast(Hero, self.source).add_exp_points(exp_points)
             return Ok('Killed')
 
-        if issubclass(type(self.target), Mob) and actual_damage > 0:
-            mob = cast(Mob, self.target)
+        if issubclass(type(self.target), MobPrototype) and actual_damage > 0:
+            mob = cast(MobPrototype, self.target)
             mob.dungeon.units.remove(self.target)
             mob.dungeon.units.append(EmbarrassmentMobDecorator(mob, 2))
 
@@ -119,7 +119,7 @@ class PickupAction(Action):
 
 # декоратор, добавляющий конфузию
 class EmbarrassmentMobDecorator(BaseMob, Unit):
-    def __init__(self, mob: Mob, embarrassment_level: int):
+    def __init__(self, mob: MobPrototype, embarrassment_level: int):
         self.mob = mob
         self.embarrassment_level = embarrassment_level
 
@@ -213,3 +213,6 @@ class EmbarrassmentMobDecorator(BaseMob, Unit):
     @property
     def symbol(self) -> str:
         return self.mob.symbol
+
+    def clone(self, **attrs):
+        self.mob.clone(attrs)

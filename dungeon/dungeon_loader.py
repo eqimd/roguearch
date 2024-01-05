@@ -4,11 +4,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import dungeon.tiles as Tiles
 from dungeon.dungeon import Dungeon
 from dungeon.inventory import Inventory
-from dungeon.units.mobs.mob import Mob
 from dungeon.units.hero import Hero, HeroAttributes
 from dungeon.units.items.item import ItemOnScreen
 from dungeon.units.items.wearable.weapon import WeaponArthurSword
-from dungeon.units.mobs.mob import Mob
+from dungeon.units.mobs.mob_prototype import MobPrototype
 
 
 class DungeonLoaderException(Exception):
@@ -37,7 +36,7 @@ class DungeonLoader:
         doors: List[Tuple[int, int]] = list()
         start: Optional[Tuple[int, int]] = None
         exits: List[Tuple[int, int]] = list()
-        units: List[Mob] = list()
+        units: List[MobPrototype] = list()
 
         # TODO: items is a stub currently
         # TODO: hero is stub here
@@ -77,7 +76,7 @@ class DungeonLoader:
                     match enemy_name:
                         case "basic":
                             try:
-                                units.append(Mob.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
+                                units.append(MobPrototype.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an enemy item', item)
                         case _:
@@ -89,13 +88,13 @@ class DungeonLoader:
                         case "basic":
                             try:
                                 units.append(
-                                    Mob.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
+                                    MobPrototype.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an mob item', item)
                         case "strategist":
                             try:
                                 units.append(
-                                    Mob.make_mob_with_strategy_by_level(dungeon, item['x'], item['y'], item['level'], item['strategy']))
+                                    MobPrototype.make_mob_with_strategy_by_level(dungeon, item['x'], item['y'], item['level'], item['strategy']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an mob item', item)
                         case _:
