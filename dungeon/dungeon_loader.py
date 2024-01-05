@@ -4,12 +4,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import dungeon.tiles as Tiles
 from dungeon.dungeon import Dungeon
 from dungeon.inventory import Inventory
-from dungeon.units.enemy import Enemy
 from dungeon.units.hero import Hero, HeroAttributes
 from dungeon.units.items.item import ItemOnScreen
 from dungeon.units.items.wearable.weapon import WeaponArthurSword
-from dungeon.units.mobs.mob import Mob
-from dungeon.units.unit import Unit
+from dungeon.units.mobs.mob_prototype import MobPrototype
 
 
 class DungeonLoaderException(Exception):
@@ -31,10 +29,6 @@ class DungeonLoaderException(Exception):
 class DungeonLoader:
     @staticmethod
     def load(path: str) -> Dungeon:
-        # map = List[List[Tile]]
-        # units = List[Unit]
-        # entities: items...
-
         with open(path, 'r') as data_in:
             data: List[Dict[str, Any]] = json.load(data_in)
 
@@ -42,12 +36,12 @@ class DungeonLoader:
         doors: List[Tuple[int, int]] = list()
         start: Optional[Tuple[int, int]] = None
         exits: List[Tuple[int, int]] = list()
-        units: List[Unit] = list()
+        units: List[MobPrototype] = list()
 
         # TODO: items is a stub currently
         # TODO: hero is stub here
         hero_stub = Hero(0, 0, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
-        dungeon = Dungeon([], [ItemOnScreen(WeaponArthurSword(), 1, 1)], hero_stub, [])
+        dungeon = Dungeon([], hero_stub, [], [ItemOnScreen(WeaponArthurSword(), 1, 1)])
 
         for item in data:
             match item['type']:
@@ -82,7 +76,7 @@ class DungeonLoader:
                     match enemy_name:
                         case "basic":
                             try:
-                                units.append(Enemy.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
+                                units.append(MobPrototype.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an enemy item', item)
                         case _:
@@ -94,13 +88,13 @@ class DungeonLoader:
                         case "basic":
                             try:
                                 units.append(
-                                    Mob.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
+                                    MobPrototype.make_basic_enemy_by_level(dungeon, item['x'], item['y'], item['level']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an mob item', item)
-                        case "strateg":
+                        case "strategist":
                             try:
                                 units.append(
-                                    Mob.make_mob_with_strategy_by_level(dungeon, item['x'], item['y'], item['level'], item['strategy']))
+                                    MobPrototype.make_mob_with_strategy_by_level(dungeon, item['x'], item['y'], item['level'], item['strategy']))
                             except KeyError:
                                 raise DungeonLoaderException('Could not parse an mob item', item)
                         case _:
@@ -110,13 +104,12 @@ class DungeonLoader:
 
         if start is None:
             raise DungeonLoaderException('')
-        # TODO: add means of loading a hero from state
-        hero = Hero(*start, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
-        # units.insert(0, hero)
 
-        map = DungeonLoader.__items_to_map(rooms, doors, exits)
-        dungeon.map = map
-        dungeon.hero = hero
+        dungeon.tiles = DungeonLoader.__items_to_map(rooms, doors, exits)
+
+        # TODO: items is a stub currently
+        # TODO: hero is stub here, add means of loading a hero from state
+        dungeon.hero = Hero(*start, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
         dungeon.units = units
 
         return dungeon

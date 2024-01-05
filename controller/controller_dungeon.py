@@ -100,6 +100,7 @@ class ControllerDungeon(Controller):
         for unit in self.dungeon.units:
             if issubclass(type(unit), BaseMob):
                 strs.append(unit.perform_action().msg)
+                unit.clone()
 
         self.dungeon.units = list(filter(lambda u: u.have_hp(), self.dungeon.units))
 

@@ -18,6 +18,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.11"
 blessed = "^1.20.0"
+numpy = "^1.26.2"
 
 
 [tool.poetry.group.dev]

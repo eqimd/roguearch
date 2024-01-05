@@ -8,7 +8,7 @@ from dungeon.dungeon import Dungeon
 from dungeon.tiles import Tile
 from dungeon.units.actions.action import Action
 from dungeon.units.actions.action_result import ActionResult, Fail
-from dungeon.units.hero import Hero
+# from dungeon.units.hero import Hero
 from dungeon.units.mobs.base_mob import BaseMob
 from dungeon.units.unit import Unit
 
@@ -16,17 +16,16 @@ import dungeon.units.actions.actions as Actions
 
 
 class MobStrategy(ABC):
-
-    def __init__(self, mob: Mob):
+    def __init__(self, mob: MobPrototype):
         self.mob = mob
 
     @abstractmethod
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
         return NotImplemented
 
 
 class BasicStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[MobPrototype], tiles: List[List[Tile]]) -> Optional[Action]:
         """
                 Primitive behaviour: attack if close
                 to the hero, come closer if not
@@ -51,7 +50,7 @@ class BasicStrategy(MobStrategy):
 
 # Аггресивная стратегия -- всегда когда моб видит героя -- атакует его, иначе пытается двигаться в сторону игрока
 class AggressiveStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[MobPrototype], tiles: List[List[Tile]]) -> Optional[Action]:
         if self.mob.hero_seen:
             return Actions.AttackAction(self.mob, hero)
         else:
@@ -61,20 +60,23 @@ class AggressiveStrategy(MobStrategy):
             ))
             shuffle(moves)
 
-            moves.sort(key=lambda move: self.mob.calculate_distance(
-                self.mob.x + move[0], self.mob.y + move[1], hero, units, tiles))
+            moves.sort(
+                key=lambda move: self.mob.calculate_distance(
+                    self.mob.x + move[0], self.mob.y + move[1], hero, units, tiles
+                )
+            )
             return Actions.MoveAction(self.mob, moves[0], self.mob.dungeon)
 
 
 # Стратегия ничего не делать
 class PassiveStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[MobPrototype], tiles: List[List[Tile]]) -> Optional[Action]:
         return None
 
 
 # Стратегия пытаться убежать от героя
 class CowardStrategy(MobStrategy):
-    def generate_action(self, hero: Hero, units: List[Unit], tiles: List[List[Tile]]) -> Optional[Action]:
+    def generate_action(self, hero, units: List[MobPrototype], tiles: List[List[Tile]]) -> Optional[Action]:
         moves = list(filter(
             lambda p: not tiles[self.mob.x + p[0]][self.mob.y + p[1]].colliding,
             [(x_diff, y_diff) for x_diff in [-1, 0, 1] for y_diff in [-1, 0, 1]]
@@ -85,11 +87,8 @@ class CowardStrategy(MobStrategy):
         return Actions.MoveAction(self.mob, moves[0], self.mob.dungeon)
 
 
-# Base class for mobs
-class Mob(Unit, BaseMob):
-    symbol_seen = 'o'
-    symbol_not_seen = 'z'
-
+# Base prototype class for all mobs
+class MobPrototype(Unit, BaseMob):
     def __init__(
             self,
             dungeon: Dungeon,
@@ -108,6 +107,8 @@ class Mob(Unit, BaseMob):
             debuff_resistance: float,
             hero_seen: bool = False,
             strategy_name: str = "",
+            symbol_seen: str = 'o',
+            symbol_not_seen: str = 'z',
     ) -> None:
         super().__init__(pos_x, pos_y)
 
@@ -131,10 +132,13 @@ class Mob(Unit, BaseMob):
 
         self.strategy: MobStrategy = self.__make_strategy_by_name(strategy_name)
 
-    def perform_action(self) -> ActionResult:
-        self.hero_seen = self.__look_for_hero(self.dungeon.hero, self.dungeon.map)
+        self.symbol_seen = symbol_seen
+        self.symbol_not_seen = symbol_not_seen
 
-        action = self.strategy.generate_action(self.dungeon.hero, self.dungeon.units, self.dungeon.map)
+    def perform_action(self) -> ActionResult:
+        self.hero_seen = self.__look_for_hero(self.dungeon.hero, self.dungeon.tiles)
+
+        action = self.strategy.generate_action(self.dungeon.hero, self.dungeon.units, self.dungeon.tiles)
 
         if action is not None:
             self.set_action(action)
@@ -143,8 +147,8 @@ class Mob(Unit, BaseMob):
 
     @staticmethod
     def make_basic_enemy_by_level(dungeon: Dungeon, pos_x: int, pos_y: int, level: int,
-                                  hero_seen: bool = False) -> Mob:
-        return Mob(dungeon, pos_x, pos_y, 10 + 2 * level, 0, level + 1, 0.8, 0.1, 2 + level, 0, 0.1, 0.2, 0.2, 0.2, hero_seen)
+                                  hero_seen: bool = False) -> MobPrototype:
+        return MobPrototype(dungeon, pos_x, pos_y, 10 + 2 * level, 0, level + 1, 0.8, 0.1, 2 + level, 0, 0.1, 0.2, 0.2, 0.2, hero_seen)
 
     def __make_strategy_by_name(self, strategy_name: str) -> MobStrategy:
         match strategy_name:
@@ -158,25 +162,9 @@ class Mob(Unit, BaseMob):
                 return BasicStrategy(self)
 
     @staticmethod
-    def make_mob_with_strategy_by_level(dungeon: Dungeon, pos_x: int, pos_y: int, level: int, strategy_name: str):
-        return Mob(
-            dungeon=dungeon,
-            pos_x=pos_x,
-            pos_y=pos_y,
-            max_hp=10 + 2 * level,
-            max_mp=0,
-            exp_points=level + 1,
-            hit_chance=0.8,
-            crit_chance=0.1,
-            physical_damage=2 + level,
-            magical_damage=0,
-            dodge_chance=0.1,
-            bleed_resistance=0.2,
-            poison_resistance=0.2,
-            debuff_resistance=0.2,
-            hero_seen=False,
-            strategy_name=strategy_name,
-        )
+    @abstractmethod
+    def make_mob_with_strategy_by_level(dungeon: Dungeon, pos_x: int, pos_y: int, level: int, strategy_name: str) -> MobPrototype:
+        pass
 
     @property
     def exp_points(self) -> int:
@@ -184,9 +172,9 @@ class Mob(Unit, BaseMob):
 
     @property
     def symbol(self) -> str:
-        return Mob.symbol_seen if self.hero_seen else Mob.symbol_not_seen
+        return self.symbol_seen if self.hero_seen else self.symbol_not_seen
 
-    def __look_for_hero(self, hero: Hero, tiles: List[List[Tile]]) -> bool:
+    def __look_for_hero(self, hero, tiles: List[List[Tile]]) -> bool:
         # use obscuring to find out whether source can see target
         points = [(hero.x, hero.y)]
 
@@ -217,7 +205,7 @@ class Mob(Unit, BaseMob):
             if not tiles[point[0]][point[1]].obscuring and any([
                 tiles[x][y].obscuring
                 for x, y
-                in Mob.__make_direct_path((self.x, self.y), point)
+                in MobPrototype.__make_direct_path((self.x, self.y), point)
             ]):
                 continue
 
@@ -294,3 +282,11 @@ class Mob(Unit, BaseMob):
     @property
     def debuff_resistance(self) -> float:
         return self.__debuff_resistance
+
+    @property
+    def name(self) -> str:
+        return 'Unnamed'
+
+    # Clone mob and add clone to the dungeon units
+    def clone(self, **attrs):
+        pass

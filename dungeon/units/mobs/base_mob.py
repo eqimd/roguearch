@@ -13,3 +13,8 @@ class BaseMob(ABC):
     @abstractmethod
     def exp_points(self) -> int:
         pass
+
+    # Clone mob in relation to it type
+    @abstractmethod
+    def clone(self, **attrs):
+        pass

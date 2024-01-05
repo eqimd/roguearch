@@ -1,5 +1,10 @@
 from controller.controller_dungeon import ControllerDungeon
 from dungeon.dungeon_loader import DungeonLoader
+from dungeon.generator.bsp_dungeon_generator import BSPDungeonGenerator
+from dungeon.generator.dungeon_builder import DungeonBuilder
+from dungeon.inventory import Inventory
+from dungeon.units.hero import Hero, HeroAttributes
+from dungeon.units.mobs.mob_factory import ScifiMobFactory
 from meta.result import *
 
 from blessed import Terminal
@@ -46,8 +51,27 @@ class ControllerMainMenu(Controller):
             case "KEY_ENTER":
                 match self.selection:
                     case 0:
-                        # TODO: start the game
-                        return Fail("Not implemented")
+                        builder = DungeonBuilder(level=0)
+                        hero = Hero(0, 0, HeroAttributes(0, 0, 0, 0, 0, 0), Inventory([]))
+                        builder.set_map_generator(BSPDungeonGenerator(
+                            hero=hero,
+                            map_size=48,
+                            rooms_amount=10,
+                            room_size_factor=2,
+                            enemy_count_factor=1,
+                            enemy_strategy_probs={
+                                'aggressive': 0.5,
+                                'coward': 0.25,
+                                'passive': 0.25,
+                                'basic': 0
+                            }
+                        ))
+                        builder.set_mob_factory(ScifiMobFactory())
+                        builder.generate()
+                        hero.x, hero.y = builder.get_start_point()
+                        self.next_ctrl = ControllerDungeon(self.terminal, builder.dungeon, self)
+
+                        return ChangeToNextController()
                     case 1:
                         dungeon = DungeonLoader.load('./assets/basic_map.json')
                         self.next_ctrl = ControllerDungeon(self.terminal, dungeon, self)
